@@ -6,9 +6,13 @@
 #include <QCompleter>
 #include <QTextEdit>
 #include <QThread>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QThread>
 #include <QMessageBox>
 #include "highlighter.h"
-
+#include "callbackdispatcher.h"
+#include "motorinterface.h"
 
 class CompletedText: public QTextEdit
 {
@@ -34,13 +38,12 @@ namespace chaiscript{
 }
 
 
-
 class ScriptWorker : public QObject
 {
     Q_OBJECT
 
 public:
-    ScriptWorker();
+    ScriptWorker(SimpleCallbackDispatcher* dispatcher);
 
 public slots:
     void doWork(QString script);
@@ -59,6 +62,9 @@ private:
     void print_uns(const unsigned & num);
     void print_float(const float & num);
     void print_double(const double & num);
+    MotorInterface* createMotorInterface(int node, int channel);
+
+    SimpleCallbackDispatcher *_dispatcher;
 };
 
 
@@ -93,6 +99,7 @@ private slots:
 
     QMessageBox::StandardButton askToSave();
 
+    void messageReceived();
 
 private:
 
@@ -104,6 +111,9 @@ private:
     bool   _isUntitled;
     bool   _modified;
     bool   _running;
+
+    SimpleCallbackDispatcher _dispatcher;
+
 signals:
     void forwardFocusInEvent(QFocusEvent *e);
 

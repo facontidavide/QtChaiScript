@@ -4,7 +4,8 @@ CONFIG += c++11
 HEADERS         = highlighter.h \
                   mainwindow.h \
                   motorinterface.h \
-                  scripteditor.h
+                  scripteditor.h \
+    callbackdispatcher.h
 SOURCES         = highlighter.cpp \
                   mainwindow.cpp \
                   main.cpp \

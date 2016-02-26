@@ -46,13 +46,7 @@ Highlighter::Highlighter(QStringList* keywordsPattern, QTextDocument *parent)
 {
     HighlightingRule rule;
 
-  /*  functionFormat.setFontItalic(true);
-    functionFormat.setForeground(Qt::blue);
-    rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
-    rule.format = functionFormat;
-    highlightingRules.append(rule);*/
     //---------------------------------------
-
     quotationFormat.setForeground(Qt::darkGreen);
     rule.pattern = QRegExp("\".*\"");
     rule.format = quotationFormat;
@@ -100,18 +94,14 @@ void Highlighter::highlightBlock(const QString &text)
             index = expression.indexIn(text, index + length);
         }
     }
-//! [7] //! [8]
     setCurrentBlockState(0);
-//! [8]
 
-//! [9]
     int startIndex = 0;
     if (previousBlockState() != 1)
         startIndex = commentStartExpression.indexIn(text);
 
-//! [9] //! [10]
+
     while (startIndex >= 0) {
-//! [10] //! [11]
         int endIndex = commentEndExpression.indexIn(text, startIndex);
         int commentLength;
         if (endIndex == -1) {
@@ -125,4 +115,4 @@ void Highlighter::highlightBlock(const QString &text)
         startIndex = commentStartExpression.indexIn(text, startIndex + commentLength);
     }
 }
-//! [11]
+

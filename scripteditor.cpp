@@ -46,7 +46,7 @@ ScriptEditor::ScriptEditor(QWidget *parent) : QWidget(parent)
 
     //----------------------------------
     _running = false;
-    ScriptWorker *worker = new ScriptWorker;
+    ScriptWorker *worker = new ScriptWorker( &_dispatcher  );
     worker->moveToThread(&_workerThread);
 
     connect(&_workerThread, &QThread::finished,     worker, &QObject::deleteLater);
@@ -153,6 +153,7 @@ bool _kill_switch_ = false;
 
 void ScriptEditor::run()
 {
+
     if( _running ){
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(0, "Warning", "Previous script still running.\nDo you want to stop it?",  QMessageBox::Yes| QMessageBox::No);
@@ -161,9 +162,13 @@ void ScriptEditor::run()
             qDebug() << "kill";
             _kill_switch_ = true;
         }
+        else{
+            _dispatcher.invoke(666);
+        }
     }
     else{
         _running = true;
+        _console->clear();
         emit executeScript( _editor->toPlainText() );
     }
 }
@@ -195,6 +200,11 @@ QMessageBox::StandardButton ScriptEditor::askToSave()
         return ret;
     }
     return QMessageBox::NoButton;
+}
+
+void ScriptEditor::messageReceived()
+{
+    //dispatch to all the
 }
 
 //-------------------------------------------------------

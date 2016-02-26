@@ -42,9 +42,21 @@ void ScriptWorker::print_double(const double & num)
     QThread::currentThread()->msleep(2);
 }
 
-ScriptWorker::ScriptWorker()
+ScriptWorker::ScriptWorker(SimpleCallbackDispatcher *dispatcher)
 {
+    _dispatcher = dispatcher;
     chai = 0;
+}
+
+MotorInterface* ScriptWorker::createMotorInterface(int node, int channel)
+{
+    MotorInterface* motor_ptr = new MotorInterface(_dispatcher, node, channel);
+    return (motor_ptr);
+}
+
+void waitMsec(int msec)
+{
+    QThread::currentThread()->msleep( msec );
 }
 
 void ScriptWorker::doWork(QString script)
@@ -57,14 +69,17 @@ void ScriptWorker::doWork(QString script)
     chai->add( chaiscript::fun(&ScriptWorker::print_float, this), "print");
     chai->add( chaiscript::fun(&ScriptWorker::print_double, this), "print");
 
+    chai->add( chaiscript::fun(&waitMsec), "waitMsec");
+
     chai->add(chaiscript::user_type<MotorInterface>(), "MotorInterface");
-    chai->add(chaiscript::constructor<MotorInterface (int,int)>(), "MotorInterface");
+    chai->add(chaiscript::fun(&ScriptWorker::createMotorInterface,this), "createMotorInterface");
     chai->add(chaiscript::fun(&MotorInterface::setTargetPosition), "setTargetPosition");
     chai->add(chaiscript::fun(&MotorInterface::getActualPosition), "getActualPosition");
 
     try {
+        // clean up list of motors
         _kill_switch_ = false;
-       chai->eval( script.toStdString().c_str() );
+        chai->eval( script.toStdString().c_str() );
 
     } catch (const double num) {
         emit error( QString::number( num ) );
