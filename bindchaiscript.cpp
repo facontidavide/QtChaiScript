@@ -58,6 +58,9 @@ void ScriptWorker::doWork(QString script)
     chai->add( chaiscript::fun(&ScriptWorker::print_double, this), "print");
 
     chai->add(chaiscript::user_type<MotorInterface>(), "MotorInterface");
+    chai->add(chaiscript::constructor<MotorInterface (int,int)>(), "MotorInterface");
+    chai->add(chaiscript::fun(&MotorInterface::setTargetPosition), "setTargetPosition");
+    chai->add(chaiscript::fun(&MotorInterface::getActualPosition), "getActualPosition");
 
     try {
         _kill_switch_ = false;
